@@ -7,7 +7,7 @@ import json
 
 uvr_path = Path(__file__).parent.parent
 
-def download_model(model_name:str, model_arch:str, model_path:List[str]=None, logger=None)->str:
+def download_model(model_name:str, model_arch:str, model_path:List[str]=None, save_path:str=None, logger=None)->str:
     """Download model from Hugging Face model hub
     
     Args:
@@ -26,8 +26,9 @@ def download_model(model_name:str, model_arch:str, model_path:List[str]=None, lo
         models_json_path = os.path.join(uvr_path, "models_dir", "models.json")
         models = json.load(open(models_json_path, "r"))
         model_path = models[model_arch][model_name]["model_path"]
-        
-    save_path = os.path.join(uvr_path, "models_dir", model_arch, "weights", model_name)
+
+    if save_path is None:
+        save_path = os.path.join(uvr_path, "models_dir", model_arch, "weights", model_name)
 
     if not os.path.exists(save_path):
         os.makedirs(save_path)
@@ -55,7 +56,7 @@ def download_model(model_name:str, model_arch:str, model_path:List[str]=None, lo
     
     return None
 
-def model_exists(model_name:str, model_arch:str, files:List=None)->bool:
+def model_exists(model_name:str, model_arch:str, save_path:str=None, files:List=None)->bool:
     """Check if the model exists in ../models_dir/{model_arch}/weights/{model_name}
     
     Args:
@@ -69,8 +70,10 @@ def model_exists(model_name:str, model_arch:str, files:List=None)->bool:
     # remove extension from the model name
     if len(model_name.split('.')) > 1:
         model_name = model_name.split('.')[0]
-    
-    save_path = os.path.join(uvr_path, "models_dir", model_arch, "weights", model_name)
+
+    if save_path is None:
+        save_path = os.path.join(uvr_path, "models_dir", model_arch, "weights", model_name)
+
     if files is not None:
         for file in files:
             local_model_path = os.path.join(save_path, file)
@@ -94,7 +97,7 @@ models_json = {
 }
 """
 
-def download_all_models(models_json:dict=None, logger=None)->dict:
+def download_all_models(models_json:dict=None, save_path:str=None, logger=None)->dict:
     """Download all models from the models_json
     
     Args:
@@ -117,7 +120,7 @@ def download_all_models(models_json:dict=None, logger=None)->dict:
         paths[model_arch] = {}
         for model_name, model_data in models.items():
             model_path = model_data["model_path"]
-            model_path = download_model(model_name=model_name, model_path=model_path, model_arch=model_arch, logger=logger)
+            model_path = download_model(model_name=model_name, model_path=model_path, model_arch=model_arch, logger=logger, save_path=save_path)
             paths[model_arch][model_name] = model_path
 
     return paths
