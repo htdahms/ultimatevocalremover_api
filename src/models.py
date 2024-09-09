@@ -103,10 +103,11 @@ class BaseModel:
         return models_list
 
 class Demucs(BaseModel):
-    
-    def __init__(self, other_metadata:dict, name:str="htdemucs", device=None, logger=None):
+    def __init__(self, other_metadata:dict, name:str="htdemucs", device=None, logger=None, model_path=None):
         super().__init__(name, architecture="demucs", other_metadata=other_metadata)
-        self.model_path = os.path.join(uvr_path, "models_dir", "demucs", "weights", name) 
+        if moded_path is None:
+            model_path = os.path.join(uvr_path, "models_dir", "demucs", "weights", name)
+        self.model_path = model_path
         self.model_api = demucs_api.Separator(self.name, repo=Path(self.model_path), device=self.device, **other_metadata)
         self.sample_rate = self.model_api._samplerate
   
@@ -151,7 +152,7 @@ class Demucs(BaseModel):
         return self.predict(audio, sampling_rate)
 
 class VrNetwork(BaseModel):
-    def __init__(self, other_metadata:dict, name:str="1_HP-UVR", device=None, logger=None):
+    def __init__(self, other_metadata:dict, name:str="1_HP-UVR", device=None, logger=None, model_path=None):
         """
         Args:
             other_metadata (dict): Other metadata for the model. Most importantly the aggressiveness
@@ -160,17 +161,20 @@ class VrNetwork(BaseModel):
             logger (_type_, optional): logger. Defaults to None.
         """
         super().__init__(name, architecture="vr_network", other_metadata=other_metadata)
-        model_path = os.path.join(uvr_path, "models_dir", "vr_network", "weights", name) 
+        if model_path is None:
+            model_path = os.path.join(uvr_path, "models_dir", "vr_network", "weights", name)
+            files = os.listdir(model_path)
+            for file_ in files:
+                if file_.split(".")[-1] in self.allowed_model_extensions():
+                    self.model_path = os.path.join(model_path, file_)
+                    break
+        else:
+            self.model_path = model_path
+
         if device is None:
             if torch.cuda.is_available(): device = "cuda"
             elif torch.backends.mps.is_available(): device = torch.device("mps")
             else: device = "cpu"
-        
-        files = os.listdir(model_path)
-        for file_ in files:
-            if file_.split(".")[-1] in self.allowed_model_extensions():
-                self.model_path = os.path.join(model_path, file_)
-                break
 
         model_run, mp, is_vr_51_model, stems  = vr_api.load_model(self.model_path, device)
         
@@ -269,12 +273,13 @@ class VrNetwork(BaseModel):
 class MDX(BaseModel):
     models_data = mdx_api.load_mdx_models_data(model_path=os.path.join(uvr_path, "models_dir", "mdx", "modelparams", "model_data.json")) 
 
-    def __init__(self, other_metadata:dict, name:str="UVR-MDX-NET-Inst_1", device=None, logger=None):
+    def __init__(self, other_metadata:dict, name:str="UVR-MDX-NET-Inst_1", device=None, logger=None, model_path=None):
         super().__init__(name, architecture="mdx", other_metadata=other_metadata)
         self.sample_rate = 44100
-        model_path = os.path.join(uvr_path, "models_dir", "mdx", "weights", name) 
-        file_name = os.listdir(model_path)[0]
-        model_path = os.path.join(model_path, file_name)
+        if model_path is None:
+            model_path = os.path.join(uvr_path, "models_dir", "mdx", "weights", name)
+            file_name = os.listdir(model_path)[0]
+            model_path = os.path.join(model_path, file_name)
         
         model_hash = mdx_api.get_model_hash_from_path(model_path)
         model_data = MDX.models_data[model_hash]
@@ -355,13 +360,14 @@ class MDX(BaseModel):
 class MDXC(BaseModel):
     models_data = mdxc_api.load_mdxc_models_data(model_path=os.path.join(uvr_path, "models_dir", "mdxc", "modelparams", "model_data.json")) 
 
-    def __init__(self, name: str, other_metadata: dict, device=None, logger=None):
+    def __init__(self, name: str, other_metadata: dict, device=None, logger=None, model_path=None):
         super().__init__(name, "mdxc", other_metadata, device, logger)
 
         self.sample_rate = 44100
-        model_path = os.path.join(uvr_path, "models_dir", "mdxc", "weights", name) 
-        file_name = os.listdir(model_path)[0]
-        model_path = os.path.join(model_path, file_name)
+        if model_path is None:
+            model_path = os.path.join(uvr_path, "models_dir", "mdxc", "weights", name)
+            file_name = os.listdir(model_path)[0]
+            model_path = os.path.join(model_path, file_name)
         model_hash = mdxc_api.get_model_hash_from_path(model_path=model_path)
 
         model_prams_dir = os.path.join(uvr_path, "models_dir", "mdxc", "modelparams") 
