@@ -17,7 +17,7 @@ import numpy as np
 import numpy.typing as npt
 from .utils.fastio import read
 # from functools import singledispatch
-from typing import Union
+from typing import Union, Optional
 
 sys.modules['demucs'] = demucs  # creates a packageA entry in sys.modules
 
@@ -27,7 +27,7 @@ with open(models_json_path, "r") as f:
     models_json = json.load(f)
     
 class BaseModel:
-    def __init__(self, name:str, architecture:str, other_metadata:dict, device=None, logger=None):
+    def __init__(self, name:str, architecture:str, other_metadata:dict, model_dir:Optional[str]=None, device=None, logger=None):
         """Base model class
 
         Args:
@@ -50,7 +50,7 @@ class BaseModel:
 
         self.device = device
         self.model_path = download_model(model_name=name, model_path=self.remote_model_path,
-                                         model_arch=architecture, logger=logger)
+                                         model_arch=architecture, logger=logger, save_path=model_dir)
 
     def __call__(self, audio:Union[npt.NDArray, str], sampling_rate:int=None, **kwargs)->dict:
         raise NotImplementedError
@@ -104,7 +104,8 @@ class BaseModel:
 
 class Demucs(BaseModel):
     def __init__(self, other_metadata:dict, name:str="htdemucs", device=None, logger=None, model_path=None):
-        super().__init__(name, architecture="demucs", other_metadata=other_metadata)
+        super().__init__(name, architecture="demucs", other_metadata=other_metadata,
+                         model_dir=os.path.dirname(model_path) if model_path is not None else None)
         if moded_path is None:
             model_path = os.path.join(uvr_path, "models_dir", "demucs", "weights", name)
         self.model_path = model_path
@@ -160,7 +161,8 @@ class VrNetwork(BaseModel):
             device (str, optional): device to run the model on. If None the model will run gpu if available. Defaults to None.
             logger (_type_, optional): logger. Defaults to None.
         """
-        super().__init__(name, architecture="vr_network", other_metadata=other_metadata)
+        super().__init__(name, architecture="vr_network", other_metadata=other_metadata,
+                         model_dir=os.path.dirname(model_path) if model_path is not None else None)
         if model_path is None:
             model_path = os.path.join(uvr_path, "models_dir", "vr_network", "weights", name)
             files = os.listdir(model_path)
@@ -274,7 +276,8 @@ class MDX(BaseModel):
     models_data = mdx_api.load_mdx_models_data(model_path=os.path.join(uvr_path, "models_dir", "mdx", "modelparams", "model_data.json")) 
 
     def __init__(self, other_metadata:dict, name:str="UVR-MDX-NET-Inst_1", device=None, logger=None, model_path=None):
-        super().__init__(name, architecture="mdx", other_metadata=other_metadata)
+        super().__init__(name, architecture="mdx", other_metadata=other_metadata,
+                         model_dir=os.path.dirname(model_path) if model_path is not None else None)
         self.sample_rate = 44100
         if model_path is None:
             model_path = os.path.join(uvr_path, "models_dir", "mdx", "weights", name)
@@ -357,11 +360,13 @@ class MDX(BaseModel):
     def list_models()->dict:
         return list(models_json["mdx"].keys())
 
+
 class MDXC(BaseModel):
     models_data = mdxc_api.load_mdxc_models_data(model_path=os.path.join(uvr_path, "models_dir", "mdxc", "modelparams", "model_data.json")) 
 
     def __init__(self, name: str, other_metadata: dict, device=None, logger=None, model_path=None):
-        super().__init__(name, "mdxc", other_metadata, device, logger)
+        super().__init__(name=name, architecture="mdxc", other_metadata=other_metadata, device=device, logger=logger,
+                         model_dir=os.path.dirname(model_path) if model_path is not None else None)
 
         self.sample_rate = 44100
         if model_path is None:
