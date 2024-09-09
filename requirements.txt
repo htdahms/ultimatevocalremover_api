@@ -27,3 +27,4 @@ onnxruntime
 onnx
 onnx2pytorch
 ml_collections
+pyrubberband
