@@ -111,7 +111,7 @@ def get_model_path(model_name: str, model_dir: str) -> str | None:
         name, extension = os.path.splitext(file)
         if name == model_name:
             file_name = name + extension
-            return os.path.exists(os.path.join(model_dir, file_name))
+            return os.path.join(model_dir, file_name)
     return None
 
 """
