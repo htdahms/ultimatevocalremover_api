@@ -16,7 +16,7 @@ def rm_models_dir(model_arch):
 def test_model_dont_exists():
     model_name = "model_name"
     model_arch = "model_arch"
-    assert get_models.model_exists(model_name=model_name, model_arch=model_arch) == False
+    assert get_models.model_exists_in_package(model_name=model_name, model_arch=model_arch) == False
 
 def test_model_exists():
     model_name = "model_name"
@@ -34,7 +34,7 @@ def test_model_exists():
         with open(local_model_path, 'w') as f:
             f.write("test")
 
-    assert get_models.model_exists(model_name=model_name, model_arch=model_arch, files=files) == True
+    assert get_models.model_exists_in_package(model_name=model_name, model_arch=model_arch, files=files) == True
     rm_models_dir(model_arch)
 
 def test_download_model():
@@ -84,7 +84,7 @@ def test_get_all_models():
             # ref_model_path = test_models_json_res[arch][model]
             ref_model_path = os.path.join(current_path, "src", "models_dir", arch, "weights", model)
             assert is_samepath(models[arch][model], ref_model_path) == True
-            assert get_models.model_exists(model_name=model, model_arch=arch) == True
+            assert get_models.model_exists_in_package(model_name=model, model_arch=arch) == True
         
         rm_models_dir(arch)
 

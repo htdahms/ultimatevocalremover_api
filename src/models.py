@@ -1,7 +1,7 @@
 import types
 
 from numpy._typing import NDArray
-from .utils.get_models import download_model, model_exists
+from .utils.get_models import download_model, model_exists_in_package
 import json 
 from .models_dir.demucs.demucs import api as demucs_api
 from .models_dir.demucs import demucs 

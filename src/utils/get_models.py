@@ -34,7 +34,7 @@ def download_model(model_name:str, model_arch:str, model_path:List[str]=None, sa
         os.makedirs(save_path)
     
     files = [path.split("/")[-1] for path in model_path]
-    if model_exists(model_name=model_name, model_arch=model_arch, files=files):
+    if model_exists_in_package(model_name=model_name, model_arch=model_arch, files=files):
         if logger:
             logger.info(f"Model {model_name} is already exists in {save_path}")
         return save_path
@@ -56,7 +56,7 @@ def download_model(model_name:str, model_arch:str, model_path:List[str]=None, sa
     
     return None
 
-def model_exists(model_name:str, model_arch:str, save_path:str=None, files:List=None)->bool:
+def model_exists_in_package(model_name:str, model_arch:str, save_path:str=None, files:List=None)->bool:
     """Check if the model exists in ../models_dir/{model_arch}/weights/{model_name}
     
     Args:
