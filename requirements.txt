@@ -1,7 +1,8 @@
 # please make sure you have already a pytorch install that is cuda enabled!
-# Duplicated requirements
-# torch>=1.8.1
-# torchaudio>=0.8,<2.1
+# Duplicated requirements with the main project
+#--extra-index-url https://download.pytorch.org/whl/cu124
+# torch
+# torchaudio
 # pytorch_lightning
 
 dora-search>=0.1.12
