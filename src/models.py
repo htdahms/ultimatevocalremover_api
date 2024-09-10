@@ -283,8 +283,6 @@ class MDX(BaseModel):
             model_dir = os.path.join(uvr_path, "models_dir", "mdx", "weights")
 
         model_path = os.path.join(model_dir, name)
-        file_name = os.listdir(model_path)[0]
-        model_path = os.path.join(model_path, file_name)
         
         model_hash = mdx_api.get_model_hash_from_path(model_path)
         model_data = MDX.models_data[model_hash]
