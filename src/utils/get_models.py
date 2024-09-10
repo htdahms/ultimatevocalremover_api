@@ -86,27 +86,33 @@ def model_exists_in_package(model_name:str, model_arch:str, save_path:str=None, 
     return False
 
 
-def model_exists(model_name: str, model_dir: str) -> bool:
-    """Check if the model exists in the dir
+def get_model_path(model_name: str, model_dir: str) -> str | None:
+    """Get model path if exists in the dir
 
     Args:
         model_name (str): model name.
         model_dir (str): model directory.
 
     Returns:
-        bool: True if the model exists, False otherwise
+        str: Path of the model file if the model file exists, None otherwise
     """
-    models_ext = [".onnx", ".pt", ".pth", ".safetensors", ".h5", ".ckpt", ".pb", ".model", ".tflite", ".tf", ".pkl"]
+    if not os.path.exists(model_dir):
+        return None
+
     name, extension = os.path.splitext(model_name)
 
     if extension:
-        return os.path.exists(os.path.join(model_dir, model_name))
+        path = os.path.join(model_dir, model_name)
+        if os.path.exists(path):
+            return path
+        return None
 
-    for ext in models_ext:
-        file_name = model_name + ext
-        if os.path.exists(os.path.join(model_dir, file_name)):
-            return True
-    return False
+    for file in os.listdir(model_dir):
+        name, extension = os.path.splitext(file)
+        if name == model_name:
+            file_name = name + extension
+            return os.path.exists(os.path.join(model_dir, file_name))
+    return None
 
 """
 Example of the model json file:
