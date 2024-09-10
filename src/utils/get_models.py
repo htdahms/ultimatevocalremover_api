@@ -56,6 +56,7 @@ def download_model(model_name:str, model_arch:str, model_path:List[str]=None, sa
     
     return None
 
+
 def model_exists_in_package(model_name:str, model_arch:str, save_path:str=None, files:List=None)->bool:
     """Check if the model exists in ../models_dir/{model_arch}/weights/{model_name}
     
@@ -82,6 +83,29 @@ def model_exists_in_package(model_name:str, model_arch:str, save_path:str=None, 
 
     if os.path.exists(save_path):
         return True
+    return False
+
+
+def model_exists(model_name: str, model_dir: str) -> bool:
+    """Check if the model exists in the dir
+
+    Args:
+        model_name (str): model name.
+        model_dir (str): model directory.
+
+    Returns:
+        bool: True if the model exists, False otherwise
+    """
+    models_ext = [".onnx", ".pt", ".pth", ".safetensors", ".h5", ".ckpt", ".pb", ".model", ".tflite", ".tf", ".pkl"]
+    name, extension = os.path.splitext(model_name)
+
+    if extension:
+        return os.path.exists(os.path.join(model_dir, model_name))
+
+    for ext in models_ext:
+        file_name = model_name + ext
+        if os.path.exists(os.path.join(model_dir, file_name)):
+            return True
     return False
 
 """
