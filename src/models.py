@@ -1,7 +1,7 @@
 import types
 
 from numpy._typing import NDArray
-from .utils.get_models import download_model, model_exists_in_package
+from .utils.get_models import download_model, model_exists_in_package, get_model_path
 import json 
 from .models_dir.demucs.demucs import api as demucs_api
 from .models_dir.demucs import demucs 
@@ -282,7 +282,7 @@ class MDX(BaseModel):
         if model_dir is None:
             model_dir = os.path.join(uvr_path, "models_dir", "mdx", "weights")
 
-        model_path = os.path.join(model_dir, name)
+        model_path = get_model_path(model_name=name, model_dir=model_dir)
         
         model_hash = mdx_api.get_model_hash_from_path(model_path)
         model_data = MDX.models_data[model_hash]
@@ -371,9 +371,7 @@ class MDXC(BaseModel):
                          model_dir=model_dir)
         if model_dir is None:
             model_dir = os.path.join(uvr_path, "models_dir", "mdxc", "weights")
-        model_path = os.path.join(model_dir, name)
-        file_name = os.listdir(model_path)[0]
-        model_path = os.path.join(model_path, file_name)
+        model_path = get_model_path(model_name=name, model_dir=model_dir)
 
         model_hash = mdxc_api.get_model_hash_from_path(model_path=model_path)
 
