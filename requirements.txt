@@ -6,7 +6,7 @@
 # pytorch_lightning
 
 dora-search>=0.1.12
-diffq>=0.2.1
+# diffq>=0.2.1 # Disabled because it needs MSVC
 einops
 flake8
 hydra-colorlog>=1.1
