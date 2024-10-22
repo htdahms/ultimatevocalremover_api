@@ -1,7 +1,7 @@
 import os
 import glob 
 import urllib.request 
-from typing import List
+from typing import List, Optional
 from pathlib import Path
 import json 
 
@@ -86,7 +86,7 @@ def model_exists_in_package(model_name:str, model_arch:str, save_path:str=None, 
     return False
 
 
-def get_model_path(model_name: str, model_dir: str) -> str | None:
+def get_model_path(model_name: str, model_dir: str) -> Optional[str]:
     """Get model path if exists in the dir
 
     Args:
