@@ -100,18 +100,18 @@ def get_model_path(model_name: str, model_dir: str) -> Optional[str]:
         return None
 
     name, extension = os.path.splitext(model_name)
+    path = os.path.join(model_dir, model_name)
 
     if extension:
-        path = os.path.join(model_dir, model_name)
         if os.path.exists(path):
             return path
         return None
 
-    for file in os.listdir(model_dir):
+    for file in os.listdir(path):
         name, extension = os.path.splitext(file)
         if name == model_name:
             file_name = name + extension
-            return os.path.join(model_dir, file_name)
+            return os.path.join(model_dir, model_name, file_name)
     return None
 
 """
